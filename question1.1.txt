@@ -1,0 +1,32 @@
+The above code throws a fatal error because we are trying to load two different classes with
+the same name using require_once. We can fix this by adding a namespace to each class. For example...
+
+    namespace Application\Module;
+    namespace Application\Support;
+
+And then in index.php change the code to...
+
+    require_once 'Application/Module/Widget.php';
+    require_once 'Support/Module/Widget.php';
+
+    $appWidget = new \Application\Module\Widget();
+    $supportWidget = new \Support\Module\Widget();
+
+    echo $appWidget->showInfo(' ') . '</br>';
+    echo $appWidget->showInfo(null);
+
+If there is an autoloader like composer setup already we could use...
+
+    use Application\Module\Widget as AppWidget;
+    use Support\Module\Widget as SupportWidget;
+
+    $appWidget = new AppWidget();
+    $supportWidget = new SupportWidget();
+
+    echo $appWidget->showInfo(' ') . '</br>';
+    echo $appWidget->showInfo(null);
+
+Regardless the output of the code is...
+
+    showInfo 10
+    showInfo:10

@@ -1,0 +1,49 @@
+In the InformalGreeter class...
+
+    class InformalGreeter extends greeter
+
+Should be...
+
+    class InformalGreeter extends Greeter
+
+The sayHello() method in the InformalGreeter is not compatible with the sayHello() method in the abstract class
+since it does not accept a string param with a default value.
+
+Another issue is that we are defining a private property 'target' in Greeter and trying to access it in
+InformalGreeter. We should change this to protected.
+
+In index.php we cannot instantiate the Greeter class since it is an abstract class. Instead...
+
+    We can make sayHello() in Greeter an abstract method..
+
+        abstract public function sayHello(string $punctuation = '!');    
+    
+    And then create a new class FormalGreeter
+
+        class FormalGreeter extends Greeter
+        {
+            public function sayHello(string $test = '')
+            {
+                echo 'Hello, ' . $this->target . '!';
+            }
+        }
+
+    And then call it...
+
+        echo "Greeting {$formalGreeter->getTarget()} ...";
+        $formalGreeter->sayHello();
+        echo "\n\n\n";
+
+Another issue is here...
+
+    echo "Greeting $informalGreeter->getTarget() ...";
+
+That is not valid syntax, we can use...
+
+    echo "Greeting {$informalGreeter->getTarget()} ...";
+
+The end result is
+
+    Greeting World ...Hello, World! 
+
+    Greeting World ...Hi, World!

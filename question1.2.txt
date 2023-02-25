@@ -1,0 +1,58 @@
+There are several issues in this code, first in the Exam class there is a syntax error...
+
+    return static::defaultText;
+
+Should be...
+
+    return static::$defaultText;
+
+In the index file in the attributes array the 'place' key should use double quotes...
+
+    'place' => "Sonny's"
+
+Also in that same array the 'time' key is calling a now() function but I don't believe this
+is valid. We could use date('Y-m-d H:i:s') or if Carbon is installed use that to get the 
+current date.
+
+In index.php there is an issue with the following line...
+
+    $exam->score = ;
+
+This property is protected so we cannot assign a value to it but even if it were public this
+is not a valid expression.
+
+When we check properties on an instantiated exam object, the __get magic method is called if
+the property is inaccessible.
+
+    The first echo... 
+    
+        echo $exam->time . "\n";
+
+        Will result in the date time being displayed since there is no time property set on
+        the object and we set it in the attributes array property through setAttributes()
+
+    The second echo...
+
+        echo $exam->place . "\n";
+
+        Will result in 'office' being displayed since there is a place property on the object
+        already and it is public.
+
+    The third echo...
+
+        echo $exam->timeLimit . "\n";
+
+        Will display nothing since there is no timeLimit property on the object and we set it
+        in the attributes array property through setAttributes()
+
+    The final echo...
+
+        echo $exam->candidate . "\n";
+        
+        Will display 'unknown' since there is no candidate property on the object and we are
+        not setting it through the getAttributes() method.
+
+It looks like in php 8.0.0+ a warning will be emitted if the __get() magic method is not given
+a public access modifier.
+
+    https://www.php.net/manual/en/language.oop5.magic.php
