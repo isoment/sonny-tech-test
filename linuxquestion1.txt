@@ -1,0 +1,32 @@
+If PHP is running in a docker container we can use the following command to search through
+the logs using a specific term...
+
+    docker logs <container-id> 2>&1 | grep "specific-error-here"
+
+Containers by default can print logs to stderr and stdout. The above command will redirect both
+and allow us to use a pipe and filter with grep. In reality it would be best to setup a central
+location where all container logs are stored for a certain time. We could use fluentd and a 
+database like mongodb for this.
+
+If the setup is not using docker we can run the following to get the locations where various
+errors can be logged...
+
+    php --info | grep error 
+
+It might be possible that PHP logs are being saved by apache, in that case it might be one of these
+locations...
+
+    /var/log/apache2/error.log
+    /var/log/httpd-error.log
+
+This will all depend on the Linux distro being used. If we want to get the last 1000 lines of the file 
+and search a specific term...
+
+    tail -n 1000 /var/log/apache2/error.log | grep "specific-error-here"
+
+    We could also play around with some other flags like -f to follow the end of the log as new entries 
+    are added
+
+We could also just search the whole log using...
+
+    grep "specific-error-here" /var/log/apache2/error.log

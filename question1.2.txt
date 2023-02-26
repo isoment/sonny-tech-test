@@ -6,7 +6,8 @@ Should be...
 
     return static::$defaultText;
 
-In the index file in the attributes array the 'place' key should use double quotes...
+In the index file in the attributes array the 'place' key should use double quotes for the value
+since there is a ' in the string...
 
     'place' => "Sonny's"
 
