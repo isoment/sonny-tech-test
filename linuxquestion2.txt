@@ -1,0 +1,54 @@
+Note: commands used will probably vary with linux distro.
+---------------------------------------------------------
+
+The first thing I would do is open the browser network tab and see if there are any error HTTP
+status codes returned when making a request. If there are they might give us some insight but from the
+description it sounds like the request is simply hanging and eventually closing because the server is
+either down or overloaded.
+
+Then I would open an SSH shell into the machine where the web server is running and see if it is running.
+
+    sudo systemctl status apache2.service -l --no-pager
+
+If it is the apache server could simply be overloaded with requests and not have enough resources. We can
+get an idea of resource usage by running...
+
+    top -p $(pgrep -d',' process_name)
+
+    If the server is using up a significant amount of resources it could simply be that there is too much
+    traffic to the site. That would be the most probable since the question states that everything is configured
+    correctly.
+
+    We use the above and replace process name with the apache process name. If this looks ok we can try checking
+    the systemd logs for any errors apache may be throwing...
+
+        sudo journalctl -u apache2.service --since today --no-pager
+
+If there is nothing obvious here I would start looking at the database. I would try to connect to the database
+from the Apache machine. If I cannot connect I would try to SSH into the database directly to determine if the whole
+thing is down.
+
+If the database is up I would again check to see the resource usage of mysql...
+
+    top -p $(pgrep -d',' process_name)
+
+If a lot of resources are being used...
+
+    When troubleshooting the database we could look to see if there were any recent changes that used inefficient
+    queries. We could enable the slow query log to see if there are any queries that are rally bogging things down.
+    From a root mysql shell...
+
+        SET GLOBAL slow_query_log_file='/var/log/mysql/mysql-slow.log';
+        SET GLOBAL slow_query_log=1;
+        SET GLOBAL long_query_time=1;
+
+        We might have to play with the long_query_time value a bit.
+
+    If there are no obvious issues with with any of the queries being run the database might be overloaded because the
+    application has gotten larger. At that point we might need to think about further increasing the server resources 
+    or scaling by setting up a master node for writing operations and slave nodes for reading operations. I believe this
+    is called replication.
+
+There is also the possibility that a recent update to the application code simply isn't working right. If there are no
+issues with the web server or database I would start looking at the PHP logs and see if there are any errors, then
+look at any recent changes and consider rolling them back if there is an issue.
