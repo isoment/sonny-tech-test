@@ -1,0 +1,25 @@
+The original SQL statement is solely for creating a new record (INSERT). When using an ORM like Eloquent
+there are handy methods like updateOrCreate() but we can accomplish the same thing in SQL using this
+statement...
+
+    INSERT INTO tbl1 (id, name)
+    VALUES (231, 'Item 231 new value') AS t
+    ON DUPLICATE KEY UPDATE 
+        name = t.name;
+
+The primary key is id. If there is no primary key 231 in the table a row with that primary key is created
+and the value is set to 'Item 231 new value'. If there is already a row with primary key 231 the name
+field is updated with the new value.
+
+We need to add an alias to the first VALUES and reference that when setting the value to update since MySQL
+says the old syntax using the VALUES() is being deprecated.
+
+    ON DUPLICATE KEY UPDATE
+        name = VALUES(name);
+
+That is all assuming that the question is asking how to INSERT or UPDATE a record. I think it is since the
+original statement is an INSERT but if the goal is simply to UPDATE a record this will work...
+
+    UPDATE tbl1
+    SET name = 'Item 231 new value'
+    WHERE id = 231;

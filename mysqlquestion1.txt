@@ -1,0 +1,16 @@
+From the information provided in the query it is not really clear how tbl3 relates to tbl2. Without
+looking at the database we can't know for sure but if we assume that tbl3 has a foreign key linking
+it to tbl2 it would look something like this...
+
+    SELECT 
+        tbl1.name,
+        tbl2.id,
+        tbl3.slug
+    FROM tbl1
+    JOIN tbl2 
+        ON tbl2.fk_tbl1_id = tbl1.id
+    JOIN tbl3 
+        ON tbl3.fk_tbl2_id = tbl2.id
+    WHERE tbl2.fk_tbl1_id NOT IN (SELECT id FROM tbl3 WHERE name NOT IN ('name1', 'name2'))
+    ORDER BY tbl1.name ASC;
+
